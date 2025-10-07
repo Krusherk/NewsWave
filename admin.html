@@ -543,11 +543,12 @@
 
             messageEl.style.display = 'none';
 
-            console.log('Attempting login for:', username);
+            console.log('Login attempt - Username:', username);
+            console.log('Checking against admin:', ADMIN_USERNAME);
 
-            // Check admin credentials
+            // Check admin credentials first
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                console.log('Admin login successful');
+                console.log('✓ Admin login successful');
                 currentUser = username;
                 currentRole = 'admin';
                 document.getElementById('authorsTabBtn').style.display = 'block';
@@ -555,33 +556,44 @@
                 return;
             }
 
+            console.log('Not admin, checking authors database...');
+
             // Check author credentials
             try {
                 const authorsRef = window.dbRef(window.db, 'authors');
                 const snapshot = await window.dbGet(authorsRef);
                 
+                console.log('Authors snapshot exists:', snapshot.exists());
+                
                 if (snapshot.exists()) {
                     const authors = snapshot.val();
+                    console.log('Authors data:', authors);
                     let found = false;
 
-                    Object.values(authors).forEach(author => {
+                    for (let authorId in authors) {
+                        const author = authors[authorId];
+                        console.log('Checking author:', author.username);
+                        
                         if (author.username === username && author.password === password) {
+                            console.log('✓ Author login successful');
                             found = true;
                             currentUser = username;
                             currentRole = 'author';
                             document.getElementById('authorsTabBtn').style.display = 'none';
                             showAdminPanel();
+                            break;
                         }
-                    });
+                    }
 
                     if (!found) {
+                        console.log('✗ No matching author found');
                         messageEl.textContent = 'Invalid username or password. Please try again.';
                         messageEl.classList.remove('success');
                         messageEl.classList.add('error');
                         messageEl.style.display = 'block';
                     }
                 } else {
-                    // No authors exist yet
+                    console.log('✗ No authors in database');
                     messageEl.textContent = 'Invalid username or password. Please try again.';
                     messageEl.classList.remove('success');
                     messageEl.classList.add('error');
@@ -589,7 +601,7 @@
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                messageEl.textContent = 'Login error. Please try again.';
+                messageEl.textContent = 'Login error: ' + error.message + '. Please try again.';
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
                 messageEl.style.display = 'block';
