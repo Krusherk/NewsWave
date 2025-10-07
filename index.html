@@ -4,9 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NewsWave - Breaking News & Latest Updates</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://newswave.com/">
     <meta property="og:title" content="NewsWave - Breaking News & Latest Updates">
     <meta property="og:description" content="Stay informed with trusted journalism">
-    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/667eea/ffffff?text=NewsWave">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://newswave.com/">
+    <meta property="twitter:title" content="NewsWave - Breaking News & Latest Updates">
+    <meta property="twitter:description" content="Stay informed with trusted journalism">
+    <meta property="twitter:image" content="https://via.placeholder.com/1200x630/667eea/ffffff?text=NewsWave">
+    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1038,19 +1050,38 @@
         }
 
         function updateMetaTags(article) {
-            document.title = `${article.title} - NewsWave`;
+            const url = window.location.href;
+            const title = article.title + ' - NewsWave';
+            const description = article.body.substring(0, 155) + '...';
+            const image = article.image;
             
-            updateOrCreateMeta('og:title', article.title);
-            updateOrCreateMeta('og:image', article.image);
-            updateOrCreateMeta('og:description', article.body.substring(0, 150) + '...');
-            updateOrCreateMeta('og:url', window.location.href);
+            document.title = title;
+            
+            // Update or create Open Graph tags
+            updateOrCreateMeta('og:type', 'article', 'property');
+            updateOrCreateMeta('og:url', url, 'property');
+            updateOrCreateMeta('og:title', title, 'property');
+            updateOrCreateMeta('og:description', description, 'property');
+            updateOrCreateMeta('og:image', image, 'property');
+            updateOrCreateMeta('og:image:width', '1200', 'property');
+            updateOrCreateMeta('og:image:height', '630', 'property');
+            
+            // Update or create Twitter tags
+            updateOrCreateMeta('twitter:card', 'summary_large_image', 'property');
+            updateOrCreateMeta('twitter:url', url, 'property');
+            updateOrCreateMeta('twitter:title', title, 'property');
+            updateOrCreateMeta('twitter:description', description, 'property');
+            updateOrCreateMeta('twitter:image', image, 'property');
+            
+            // Update or create standard meta tags
+            updateOrCreateMeta('description', description, 'name');
         }
 
-        function updateOrCreateMeta(property, content) {
-            let meta = document.querySelector(`meta[property="${property}"]`);
+        function updateOrCreateMeta(property, content, attributeType = 'property') {
+            let meta = document.querySelector(`meta[${attributeType}="${property}"]`);
             if (!meta) {
                 meta = document.createElement('meta');
-                meta.setAttribute('property', property);
+                meta.setAttribute(attributeType, property);
                 document.head.appendChild(meta);
             }
             meta.setAttribute('content', content);
