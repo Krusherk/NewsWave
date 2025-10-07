@@ -583,13 +583,17 @@
 
         async function handleLogin(e) {
             e.preventDefault();
+            
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
             const messageEl = document.getElementById('loginMessage');
 
+            console.log('Login attempt:', username);
+            
             messageEl.style.display = 'none';
 
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                console.log('Admin login successful');
                 currentUser = username;
                 currentRole = 'admin';
                 document.getElementById('authorsTabBtn').style.display = 'block';
@@ -597,9 +601,11 @@
                 return;
             }
 
+            console.log('Checking authors...');
+            
             try {
-                const authorsRef = window.dbRef(window.db, 'authors');
-                const snapshot = await window.dbGet(authorsRef);
+                const authorsRef = window.firebaseRef(window.firebaseDB, 'authors');
+                const snapshot = await window.firebaseGet(authorsRef);
                 
                 if (snapshot.exists()) {
                     const authors = snapshot.val();
@@ -609,6 +615,7 @@
                         const author = authors[authorId];
                         
                         if (author.username === username && author.password === password) {
+                            console.log('Author login successful');
                             found = true;
                             currentUser = username;
                             currentRole = 'author';
@@ -619,18 +626,21 @@
                     }
 
                     if (!found) {
+                        console.log('Login failed');
                         messageEl.textContent = 'Invalid username or password';
                         messageEl.classList.remove('success');
                         messageEl.classList.add('error');
                         messageEl.style.display = 'block';
                     }
                 } else {
+                    console.log('No authors found');
                     messageEl.textContent = 'Invalid username or password';
                     messageEl.classList.remove('success');
                     messageEl.classList.add('error');
                     messageEl.style.display = 'block';
                 }
             } catch (error) {
+                console.error('Login error:', error);
                 messageEl.textContent = 'Login error: ' + error.message;
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
@@ -715,8 +725,8 @@
                 const sanitizedFileName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
                 const imageFileName = 'news-images/' + timestamp + '-' + sanitizedFileName;
                 
-                const imageRef = window.storageRef(window.storage, imageFileName);
-                const uploadTask = window.uploadBytesResumable(imageRef, imageFile);
+                const imageRef = window.firebaseStorageRef(window.firebaseStorage, imageFileName);
+                const uploadTask = window.firebaseUpload(imageRef, imageFile);
 
                 uploadTask.on('state_changed',
                     (snapshot) => {
@@ -724,7 +734,7 @@
                         document.getElementById('progressBar').style.width = progress + '%';
                         document.getElementById('progressText').textContent = Math.round(progress) + '%';
                     },
-                    (error) {
+                    (error) => {
                         document.getElementById('uploadProgress').style.display = 'none';
                         let errorMessage = 'Upload error: ';
                         if (error.code === 'storage/unauthorized') {
@@ -739,13 +749,13 @@
                     },
                     async () => {
                         try {
-                            const downloadURL = await window.getDownloadURL(uploadTask.snapshot.ref);
+                            const downloadURL = await window.firebaseGetURL(uploadTask.snapshot.ref);
                             
-                            const newsRef = window.dbRef(window.db, 'news');
-                            const newNewsRef = window.dbPush(newsRef);
+                            const newsRef = window.firebaseRef(window.firebaseDB, 'news');
+                            const newNewsRef = window.firebasePush(newsRef);
                             const slug = createSlug(title);
 
-                            await window.dbSet(newNewsRef, {
+                            await window.firebaseSet(newNewsRef, {
                                 title: title,
                                 category: category,
                                 image: downloadURL,
@@ -797,8 +807,8 @@
             messageEl.style.display = 'none';
 
             try {
-                const authorsRef = window.dbRef(window.db, 'authors');
-                const snapshot = await window.dbGet(authorsRef);
+                const authorsRef = window.firebaseRef(window.firebaseDB, 'authors');
+                const snapshot = await window.firebaseGet(authorsRef);
                 
                 let exists = false;
                 if (snapshot.exists()) {
@@ -817,8 +827,8 @@
                     messageEl.classList.add('error');
                     messageEl.style.display = 'block';
                 } else {
-                    const newAuthorRef = window.dbPush(authorsRef);
-                    await window.dbSet(newAuthorRef, {
+                    const newAuthorRef = window.firebasePush(authorsRef);
+                    await window.firebaseSet(newAuthorRef, {
                         username: username,
                         password: password,
                         role: 'author',
