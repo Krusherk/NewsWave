@@ -283,7 +283,42 @@
             color: #764ba2;
         }
 
-        /* Mobile Optimization */
+        #imagePreview {
+            margin-top: 12px;
+            display: none;
+        }
+
+        #previewImg {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            border: 2px solid #e5e5e5;
+        }
+
+        #uploadProgress {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .progress-bar-container {
+            background: #e5e5e5;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #progressBar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 8px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+        }
+
         @media (max-width: 768px) {
             .admin-header-content {
                 padding: 0 20px;
@@ -365,7 +400,6 @@
             }
         }
 
-        /* Desktop Optimization */
         @media (min-width: 1400px) {
             .admin-panel,
             .admin-header-content {
@@ -387,9 +421,8 @@
         </div>
     </div>
 
-    <a href="index.html" class="back-link">← Back to Website</a>
+    <a href="index.html" class="back-link">Back to Website</a>
 
-    <!-- Login Form -->
     <div id="loginContainer" class="login-container">
         <h1>Admin Login</h1>
         <p class="login-subtitle">Enter your credentials to access the admin panel</p>
@@ -408,7 +441,6 @@
         </form>
     </div>
 
-    <!-- Admin Panel -->
     <div id="adminPanel" class="admin-panel">
         <div class="welcome-section">
             <h1>Welcome back!</h1>
@@ -420,7 +452,6 @@
             <button class="tab" id="authorsTabBtn" onclick="switchTab('authors')" style="display: none;">Manage Authors</button>
         </div>
 
-        <!-- Post Article Tab -->
         <div id="postTab" class="tab-content active">
             <h2 class="form-section-title">Create New Article</h2>
             <form onsubmit="publishArticle(event)">
@@ -448,15 +479,15 @@
                 <div class="form-group">
                     <label>Featured Image</label>
                     <input type="file" id="postImage" accept="image/*" required>
-                    <div class="form-hint">Upload an image from your device (JPG, PNG, GIF) - This will be shown when sharing on social media</div>
-                    <div id="imagePreview" style="margin-top: 12px; display: none;">
-                        <img id="previewImg" style="max-width: 100%; max-height: 300px; border-radius: 4px; border: 2px solid #e5e5e5;" alt="Preview">
+                    <div class="form-hint">Upload an image from your device (JPG, PNG, GIF)</div>
+                    <div id="imagePreview">
+                        <img id="previewImg" alt="Preview">
                     </div>
-                    <div id="uploadProgress" style="margin-top: 12px; display: none;">
-                        <div style="background: #e5e5e5; border-radius: 4px; overflow: hidden;">
-                            <div id="progressBar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 8px; width: 0%; transition: width 0.3s;"></div>
+                    <div id="uploadProgress">
+                        <div class="progress-bar-container">
+                            <div id="progressBar"></div>
                         </div>
-                        <p style="font-size: 13px; color: #666; margin-top: 8px;">Uploading: <span id="progressText">0%</span></p>
+                        <p class="progress-text">Uploading: <span id="progressText">0%</span></p>
                     </div>
                 </div>
 
@@ -470,7 +501,6 @@
             </form>
         </div>
 
-        <!-- Manage Authors Tab -->
         <div id="authorsTab" class="tab-content">
             <h2 class="form-section-title">Create Author Account</h2>
             <p style="color: #666; margin-bottom: 24px;">Authors can login and post articles but cannot manage other authors.</p>
@@ -496,7 +526,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, push, set, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
         
@@ -531,9 +561,25 @@
         let currentUser = null;
         let currentRole = null;
 
-        // Admin credentials
         const ADMIN_USERNAME = 'rabiuk';
-        const ADMIN_PASSWORD = 'kareembilkis13
+        const ADMIN_PASSWORD = 'kareembilkis13$';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('postImage');
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            document.getElementById('previewImg').src = event.target.result;
+                            document.getElementById('imagePreview').style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
 
         async function handleLogin(e) {
             e.preventDefault();
@@ -543,12 +589,7 @@
 
             messageEl.style.display = 'none';
 
-            console.log('Login attempt - Username:', username);
-            console.log('Checking against admin:', ADMIN_USERNAME);
-
-            // Check admin credentials first
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                console.log('✓ Admin login successful');
                 currentUser = username;
                 currentRole = 'admin';
                 document.getElementById('authorsTabBtn').style.display = 'block';
@@ -556,26 +597,18 @@
                 return;
             }
 
-            console.log('Not admin, checking authors database...');
-
-            // Check author credentials
             try {
                 const authorsRef = window.dbRef(window.db, 'authors');
                 const snapshot = await window.dbGet(authorsRef);
                 
-                console.log('Authors snapshot exists:', snapshot.exists());
-                
                 if (snapshot.exists()) {
                     const authors = snapshot.val();
-                    console.log('Authors data:', authors);
                     let found = false;
 
                     for (let authorId in authors) {
                         const author = authors[authorId];
-                        console.log('Checking author:', author.username);
                         
                         if (author.username === username && author.password === password) {
-                            console.log('✓ Author login successful');
                             found = true;
                             currentUser = username;
                             currentRole = 'author';
@@ -586,22 +619,19 @@
                     }
 
                     if (!found) {
-                        console.log('✗ No matching author found');
-                        messageEl.textContent = 'Invalid username or password. Please try again.';
+                        messageEl.textContent = 'Invalid username or password';
                         messageEl.classList.remove('success');
                         messageEl.classList.add('error');
                         messageEl.style.display = 'block';
                     }
                 } else {
-                    console.log('✗ No authors in database');
-                    messageEl.textContent = 'Invalid username or password. Please try again.';
+                    messageEl.textContent = 'Invalid username or password';
                     messageEl.classList.remove('success');
                     messageEl.classList.add('error');
                     messageEl.style.display = 'block';
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                messageEl.textContent = 'Login error: ' + error.message + '. Please try again.';
+                messageEl.textContent = 'Login error: ' + error.message;
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
                 messageEl.style.display = 'block';
@@ -662,25 +692,15 @@
             const messageEl = document.getElementById('postMessage');
 
             if (!imageFile) {
-                messageEl.textContent = 'Please select an image to upload.';
+                messageEl.textContent = 'Please select an image';
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
                 messageEl.style.display = 'block';
                 return;
             }
 
-            // Check file size (max 5MB)
             if (imageFile.size > 5 * 1024 * 1024) {
-                messageEl.textContent = 'Image is too large. Please select an image smaller than 5MB.';
-                messageEl.classList.remove('success');
-                messageEl.classList.add('error');
-                messageEl.style.display = 'block';
-                return;
-            }
-
-            // Check file type
-            if (!imageFile.type.startsWith('image/')) {
-                messageEl.textContent = 'Please select a valid image file (JPG, PNG, GIF).';
+                messageEl.textContent = 'Image must be smaller than 5MB';
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
                 messageEl.style.display = 'block';
@@ -690,60 +710,41 @@
             messageEl.style.display = 'none';
             document.getElementById('uploadProgress').style.display = 'block';
 
-            console.log('Starting upload for file:', imageFile.name, 'Size:', imageFile.size);
-
             try {
-                // Upload image to Firebase Storage
                 const timestamp = Date.now();
                 const sanitizedFileName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-                const imageFileName = `news-images/${timestamp}-${sanitizedFileName}`;
-                
-                console.log('Storage path:', imageFileName);
+                const imageFileName = 'news-images/' + timestamp + '-' + sanitizedFileName;
                 
                 const imageRef = window.storageRef(window.storage, imageFileName);
                 const uploadTask = window.uploadBytesResumable(imageRef, imageFile);
 
                 uploadTask.on('state_changed',
                     (snapshot) => {
-                        // Progress
                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         document.getElementById('progressBar').style.width = progress + '%';
                         document.getElementById('progressText').textContent = Math.round(progress) + '%';
-                        console.log('Upload progress:', Math.round(progress) + '%');
                     },
-                    (error) => {
-                        // Error
-                        console.error('Upload error:', error);
-                        console.error('Error code:', error.code);
-                        console.error('Error message:', error.message);
-                        
+                    (error) {
                         document.getElementById('uploadProgress').style.display = 'none';
-                        
-                        let errorMessage = 'Error uploading image: ';
+                        let errorMessage = 'Upload error: ';
                         if (error.code === 'storage/unauthorized') {
-                            errorMessage += 'Storage permission denied. Please configure Firebase Storage rules.';
+                            errorMessage += 'Storage not configured. Please set up Firebase Storage rules.';
                         } else {
                             errorMessage += error.message;
                         }
-                        
                         messageEl.textContent = errorMessage;
                         messageEl.classList.remove('success');
                         messageEl.classList.add('error');
                         messageEl.style.display = 'block';
                     },
                     async () => {
-                        // Complete
                         try {
-                            console.log('Upload complete, getting download URL...');
                             const downloadURL = await window.getDownloadURL(uploadTask.snapshot.ref);
-                            console.log('Download URL:', downloadURL);
                             
-                            // Save article to database
                             const newsRef = window.dbRef(window.db, 'news');
                             const newNewsRef = window.dbPush(newsRef);
                             const slug = createSlug(title);
 
-                            console.log('Saving article to database...');
                             await window.dbSet(newNewsRef, {
                                 title: title,
                                 category: category,
@@ -754,27 +755,22 @@
                                 slug: slug
                             });
 
-                            console.log('Article published successfully!');
                             document.getElementById('uploadProgress').style.display = 'none';
-                            messageEl.textContent = '✓ Article published successfully! Your article is now live on the website.';
+                            messageEl.textContent = 'Article published successfully!';
                             messageEl.classList.remove('error');
                             messageEl.classList.add('success');
                             messageEl.style.display = 'block';
                             
-                            // Clear form
                             document.getElementById('postTitle').value = '';
                             document.getElementById('postCategory').value = '';
                             document.getElementById('postImage').value = '';
                             document.getElementById('postBody').value = '';
                             document.getElementById('imagePreview').style.display = 'none';
                             
-                            messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                            
                             setTimeout(() => {
                                 messageEl.style.display = 'none';
                             }, 5000);
                         } catch (error) {
-                            console.error('Database error:', error);
                             document.getElementById('uploadProgress').style.display = 'none';
                             messageEl.textContent = 'Error saving article: ' + error.message;
                             messageEl.classList.remove('success');
@@ -784,9 +780,8 @@
                     }
                 );
             } catch (error) {
-                console.error('Publish error:', error);
                 document.getElementById('uploadProgress').style.display = 'none';
-                messageEl.textContent = 'Error publishing article: ' + error.message;
+                messageEl.textContent = 'Error: ' + error.message;
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
                 messageEl.style.display = 'block';
@@ -808,15 +803,16 @@
                 let exists = false;
                 if (snapshot.exists()) {
                     const authors = snapshot.val();
-                    Object.values(authors).forEach(author => {
-                        if (author.username === username) {
+                    for (let authorId in authors) {
+                        if (authors[authorId].username === username) {
                             exists = true;
+                            break;
                         }
-                    });
+                    }
                 }
 
                 if (exists) {
-                    messageEl.textContent = 'Username already exists. Please choose a different username.';
+                    messageEl.textContent = 'Username already exists';
                     messageEl.classList.remove('success');
                     messageEl.classList.add('error');
                     messageEl.style.display = 'block';
@@ -830,7 +826,7 @@
                         createdBy: currentUser
                     });
 
-                    messageEl.textContent = '✓ Author account created successfully! They can now login with these credentials.';
+                    messageEl.textContent = 'Author created successfully!';
                     messageEl.classList.remove('error');
                     messageEl.classList.add('success');
                     messageEl.style.display = 'block';
@@ -838,251 +834,12 @@
                     document.getElementById('authorUsername').value = '';
                     document.getElementById('authorPassword').value = '';
                     
-                    messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    
                     setTimeout(() => {
                         messageEl.style.display = 'none';
                     }, 5000);
                 }
             } catch (error) {
-                console.error('Create author error:', error);
-                messageEl.textContent = 'Error creating author: ' + error.message;
-                messageEl.classList.remove('success');
-                messageEl.classList.add('error');
-                messageEl.style.display = 'block';
-            }
-        }
-    </script>
-</body>
-</html>;
-
-        // Image preview on file select
-        document.addEventListener('DOMContentLoaded', function() {
-            const imageInput = document.getElementById('postImage');
-            if (imageInput) {
-                imageInput.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(event) {
-                            document.getElementById('previewImg').src = event.target.result;
-                            document.getElementById('imagePreview').style.display = 'block';
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
-        });
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            const messageEl = document.getElementById('loginMessage');
-
-            messageEl.style.display = 'none';
-
-            console.log('Attempting login for:', username);
-
-            // Check admin credentials
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                console.log('Admin login successful');
-                currentUser = username;
-                currentRole = 'admin';
-                document.getElementById('authorsTabBtn').style.display = 'block';
-                showAdminPanel();
-                return;
-            }
-
-            // Check author credentials
-            try {
-                const authorsRef = window.dbRef(window.db, 'authors');
-                const snapshot = await window.dbGet(authorsRef);
-                
-                if (snapshot.exists()) {
-                    const authors = snapshot.val();
-                    let found = false;
-
-                    Object.values(authors).forEach(author => {
-                        if (author.username === username && author.password === password) {
-                            found = true;
-                            currentUser = username;
-                            currentRole = 'author';
-                            document.getElementById('authorsTabBtn').style.display = 'none';
-                            showAdminPanel();
-                        }
-                    });
-
-                    if (!found) {
-                        messageEl.textContent = 'Invalid username or password. Please try again.';
-                        messageEl.classList.remove('success');
-                        messageEl.classList.add('error');
-                        messageEl.style.display = 'block';
-                    }
-                } else {
-                    // No authors exist yet
-                    messageEl.textContent = 'Invalid username or password. Please try again.';
-                    messageEl.classList.remove('success');
-                    messageEl.classList.add('error');
-                    messageEl.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                messageEl.textContent = 'Login error. Please try again.';
-                messageEl.classList.remove('success');
-                messageEl.classList.add('error');
-                messageEl.style.display = 'block';
-            }
-        }
-
-        function showAdminPanel() {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('userInfo').style.display = 'block';
-            document.getElementById('currentUser').textContent = currentUser;
-            window.scrollTo(0, 0);
-        }
-
-        function logout() {
-            currentUser = null;
-            currentRole = null;
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loginContainer').style.display = 'block';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('userInfo').style.display = 'none';
-            
-            document.querySelectorAll('.message').forEach(msg => {
-                msg.style.display = 'none';
-            });
-            
-            document.querySelectorAll('form').forEach(form => form.reset());
-            window.scrollTo(0, 0);
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            
-            if (tab === 'post') {
-                document.querySelectorAll('.tab')[0].classList.add('active');
-                document.getElementById('postTab').classList.add('active');
-            } else {
-                document.querySelectorAll('.tab')[1].classList.add('active');
-                document.getElementById('authorsTab').classList.add('active');
-            }
-        }
-
-        function createSlug(title) {
-            return title.toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/^-|-$/g, '')
-                .substring(0, 60);
-        }
-
-        async function publishArticle(e) {
-            e.preventDefault();
-            const title = document.getElementById('postTitle').value.trim();
-            const category = document.getElementById('postCategory').value;
-            const image = document.getElementById('postImage').value.trim();
-            const body = document.getElementById('postBody').value.trim();
-            const messageEl = document.getElementById('postMessage');
-
-            const newsRef = window.dbRef(window.db, 'news');
-            const newNewsRef = window.dbPush(newsRef);
-            const slug = createSlug(title);
-
-            messageEl.style.display = 'none';
-
-            try {
-                await window.dbSet(newNewsRef, {
-                    title: title,
-                    category: category,
-                    image: image,
-                    body: body,
-                    author: currentUser,
-                    date: new Date().toISOString(),
-                    slug: slug
-                });
-
-                messageEl.textContent = '✓ Article published successfully! Your article is now live on the website.';
-                messageEl.classList.remove('error');
-                messageEl.classList.add('success');
-                messageEl.style.display = 'block';
-                
-                document.getElementById('postTitle').value = '';
-                document.getElementById('postCategory').value = '';
-                document.getElementById('postImage').value = '';
-                document.getElementById('postBody').value = '';
-                
-                messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                
-                setTimeout(() => {
-                    messageEl.style.display = 'none';
-                }, 5000);
-            } catch (error) {
-                console.error('Publish error:', error);
-                messageEl.textContent = 'Error publishing article: ' + error.message;
-                messageEl.classList.remove('success');
-                messageEl.classList.add('error');
-                messageEl.style.display = 'block';
-            }
-        }
-
-        async function createAuthor(e) {
-            e.preventDefault();
-            const username = document.getElementById('authorUsername').value.trim();
-            const password = document.getElementById('authorPassword').value;
-            const messageEl = document.getElementById('authorMessage');
-
-            messageEl.style.display = 'none';
-
-            try {
-                const authorsRef = window.dbRef(window.db, 'authors');
-                const snapshot = await window.dbGet(authorsRef);
-                
-                let exists = false;
-                if (snapshot.exists()) {
-                    const authors = snapshot.val();
-                    Object.values(authors).forEach(author => {
-                        if (author.username === username) {
-                            exists = true;
-                        }
-                    });
-                }
-
-                if (exists) {
-                    messageEl.textContent = 'Username already exists. Please choose a different username.';
-                    messageEl.classList.remove('success');
-                    messageEl.classList.add('error');
-                    messageEl.style.display = 'block';
-                } else {
-                    const newAuthorRef = window.dbPush(authorsRef);
-                    await window.dbSet(newAuthorRef, {
-                        username: username,
-                        password: password,
-                        role: 'author',
-                        createdAt: new Date().toISOString(),
-                        createdBy: currentUser
-                    });
-
-                    messageEl.textContent = '✓ Author account created successfully! They can now login with these credentials.';
-                    messageEl.classList.remove('error');
-                    messageEl.classList.add('success');
-                    messageEl.style.display = 'block';
-                    
-                    document.getElementById('authorUsername').value = '';
-                    document.getElementById('authorPassword').value = '';
-                    
-                    messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    
-                    setTimeout(() => {
-                        messageEl.style.display = 'none';
-                    }, 5000);
-                }
-            } catch (error) {
-                console.error('Create author error:', error);
-                messageEl.textContent = 'Error creating author: ' + error.message;
+                messageEl.textContent = 'Error: ' + error.message;
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
                 messageEl.style.display = 'block';
