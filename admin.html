@@ -33,23 +33,27 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .admin-logo {
             font-family: 'Playfair Display', serif;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
         }
 
         .admin-user {
             font-size: 14px;
             color: #999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .admin-user span {
             color: #dc2626;
             font-weight: 600;
-            margin: 0 8px;
         }
 
         .logout-btn {
@@ -63,7 +67,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             transition: all 0.3s;
-            margin-left: 20px;
         }
 
         .logout-btn:hover {
@@ -98,7 +101,7 @@
             display: none;
             max-width: 1200px;
             margin: 40px auto;
-            padding: 0 40px;
+            padding: 0 40px 40px;
         }
 
         .welcome-section {
@@ -125,6 +128,7 @@
             gap: 16px;
             margin-bottom: 32px;
             border-bottom: 2px solid #e5e5e5;
+            overflow-x: auto;
         }
 
         .tab {
@@ -140,6 +144,7 @@
             border-bottom: 3px solid transparent;
             transition: all 0.3s;
             margin-bottom: -2px;
+            white-space: nowrap;
         }
 
         .tab.active {
@@ -278,10 +283,29 @@
             color: #764ba2;
         }
 
+        /* Mobile Optimization */
         @media (max-width: 768px) {
-            .admin-header-content,
-            .admin-panel {
+            .admin-header-content {
                 padding: 0 20px;
+            }
+
+            .admin-logo {
+                font-size: 22px;
+            }
+
+            .admin-user {
+                font-size: 12px;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .logout-btn {
+                padding: 6px 16px;
+                font-size: 12px;
+            }
+
+            .back-link {
+                margin: 20px;
             }
 
             .login-container {
@@ -289,17 +313,13 @@
                 padding: 32px 24px;
             }
 
-            .tab-content {
-                padding: 24px;
+            .login-container h1 {
+                font-size: 28px;
             }
 
-            .tabs {
-                overflow-x: auto;
-            }
-
-            .tab {
-                padding: 12px 20px;
-                font-size: 13px;
+            .admin-panel {
+                padding: 0 20px 20px;
+                margin: 20px auto;
             }
 
             .welcome-section {
@@ -307,7 +327,49 @@
             }
 
             .welcome-section h1 {
-                font-size: 32px;
+                font-size: 28px;
+            }
+
+            .welcome-section p {
+                font-size: 14px;
+            }
+
+            .tabs {
+                gap: 8px;
+            }
+
+            .tab {
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+
+            .tab-content {
+                padding: 24px 20px;
+            }
+
+            .form-section-title {
+                font-size: 22px;
+            }
+
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 14px 32px;
+                font-size: 14px;
+                width: 100%;
+            }
+        }
+
+        /* Desktop Optimization */
+        @media (min-width: 1400px) {
+            .admin-panel,
+            .admin-header-content {
+                max-width: 1400px;
             }
         }
     </style>
@@ -317,10 +379,10 @@
         <div class="admin-header-content">
             <div class="admin-logo">NewsWave Admin</div>
             <div id="userInfo" style="display: none;">
-                <span class="admin-user">
-                    Logged in as <span id="currentUser"></span>
+                <div class="admin-user">
+                    <span>Logged in as <span id="currentUser"></span></span>
                     <button class="logout-btn" onclick="logout()">Logout</button>
-                </span>
+                </div>
             </div>
         </div>
     </div>
@@ -425,7 +487,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
         
         const firebaseConfig = {
@@ -447,7 +509,7 @@
         window.dbRef = ref;
         window.dbPush = push;
         window.dbSet = set;
-        window.onValue = onValue;
+        window.dbGet = get;
     </script>
 
     <script>
@@ -456,9 +518,9 @@
 
         // Admin credentials
         const ADMIN_USERNAME = 'rabiuk';
-        const ADMIN_PASSWORD = 'kareembilkis13;
+        const ADMIN_PASSWORD = 'kareembilkis13$';
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -466,23 +528,27 @@
 
             messageEl.style.display = 'none';
 
+            console.log('Attempting login for:', username);
+
+            // Check admin credentials
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                console.log('Admin login successful');
                 currentUser = username;
                 currentRole = 'admin';
                 document.getElementById('authorsTabBtn').style.display = 'block';
                 showAdminPanel();
-            } else {
-                checkAuthorCredentials(username, password, messageEl);
+                return;
             }
-        }
 
-        function checkAuthorCredentials(username, password, messageEl) {
-            const authorsRef = window.dbRef(window.db, 'authors');
-            window.onValue(authorsRef, (snapshot) => {
-                const authors = snapshot.val();
-                let found = false;
+            // Check author credentials
+            try {
+                const authorsRef = window.dbRef(window.db, 'authors');
+                const snapshot = await window.dbGet(authorsRef);
+                
+                if (snapshot.exists()) {
+                    const authors = snapshot.val();
+                    let found = false;
 
-                if (authors) {
                     Object.values(authors).forEach(author => {
                         if (author.username === username && author.password === password) {
                             found = true;
@@ -492,15 +558,27 @@
                             showAdminPanel();
                         }
                     });
-                }
 
-                if (!found) {
+                    if (!found) {
+                        messageEl.textContent = 'Invalid username or password. Please try again.';
+                        messageEl.classList.remove('success');
+                        messageEl.classList.add('error');
+                        messageEl.style.display = 'block';
+                    }
+                } else {
+                    // No authors exist yet
                     messageEl.textContent = 'Invalid username or password. Please try again.';
                     messageEl.classList.remove('success');
                     messageEl.classList.add('error');
                     messageEl.style.display = 'block';
                 }
-            }, { onlyOnce: true });
+            } catch (error) {
+                console.error('Login error:', error);
+                messageEl.textContent = 'Login error. Please try again.';
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
         }
 
         function showAdminPanel() {
@@ -508,6 +586,7 @@
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('userInfo').style.display = 'block';
             document.getElementById('currentUser').textContent = currentUser;
+            window.scrollTo(0, 0);
         }
 
         function logout() {
@@ -519,13 +598,12 @@
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('userInfo').style.display = 'none';
             
-            // Clear all messages
             document.querySelectorAll('.message').forEach(msg => {
                 msg.style.display = 'none';
             });
             
-            // Reset forms
             document.querySelectorAll('form').forEach(form => form.reset());
+            window.scrollTo(0, 0);
         }
 
         function switchTab(tab) {
@@ -548,7 +626,7 @@
                 .substring(0, 60);
         }
 
-        function publishArticle(e) {
+        async function publishArticle(e) {
             e.preventDefault();
             const title = document.getElementById('postTitle').value.trim();
             const category = document.getElementById('postCategory').value;
@@ -562,42 +640,42 @@
 
             messageEl.style.display = 'none';
 
-            window.dbSet(newNewsRef, {
-                title: title,
-                category: category,
-                image: image,
-                body: body,
-                author: currentUser,
-                date: new Date().toISOString(),
-                slug: slug
-            }).then(() => {
+            try {
+                await window.dbSet(newNewsRef, {
+                    title: title,
+                    category: category,
+                    image: image,
+                    body: body,
+                    author: currentUser,
+                    date: new Date().toISOString(),
+                    slug: slug
+                });
+
                 messageEl.textContent = '✓ Article published successfully! Your article is now live on the website.';
                 messageEl.classList.remove('error');
                 messageEl.classList.add('success');
                 messageEl.style.display = 'block';
                 
-                // Clear form
                 document.getElementById('postTitle').value = '';
                 document.getElementById('postCategory').value = '';
                 document.getElementById('postImage').value = '';
                 document.getElementById('postBody').value = '';
                 
-                // Scroll to message
                 messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 
-                // Hide message after 5 seconds
                 setTimeout(() => {
                     messageEl.style.display = 'none';
                 }, 5000);
-            }).catch((error) => {
+            } catch (error) {
+                console.error('Publish error:', error);
                 messageEl.textContent = 'Error publishing article: ' + error.message;
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
                 messageEl.style.display = 'block';
-            });
+            }
         }
 
-        function createAuthor(e) {
+        async function createAuthor(e) {
             e.preventDefault();
             const username = document.getElementById('authorUsername').value.trim();
             const password = document.getElementById('authorPassword').value;
@@ -605,13 +683,13 @@
 
             messageEl.style.display = 'none';
 
-            // Check if author already exists
-            const authorsRef = window.dbRef(window.db, 'authors');
-            window.onValue(authorsRef, (snapshot) => {
-                const authors = snapshot.val();
+            try {
+                const authorsRef = window.dbRef(window.db, 'authors');
+                const snapshot = await window.dbGet(authorsRef);
+                
                 let exists = false;
-
-                if (authors) {
+                if (snapshot.exists()) {
+                    const authors = snapshot.val();
                     Object.values(authors).forEach(author => {
                         if (author.username === username) {
                             exists = true;
@@ -626,37 +704,35 @@
                     messageEl.style.display = 'block';
                 } else {
                     const newAuthorRef = window.dbPush(authorsRef);
-                    window.dbSet(newAuthorRef, {
+                    await window.dbSet(newAuthorRef, {
                         username: username,
                         password: password,
                         role: 'author',
                         createdAt: new Date().toISOString(),
                         createdBy: currentUser
-                    }).then(() => {
-                        messageEl.textContent = '✓ Author account created successfully! They can now login with these credentials.';
-                        messageEl.classList.remove('error');
-                        messageEl.classList.add('success');
-                        messageEl.style.display = 'block';
-                        
-                        // Clear form
-                        document.getElementById('authorUsername').value = '';
-                        document.getElementById('authorPassword').value = '';
-                        
-                        // Scroll to message
-                        messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        
-                        // Hide message after 5 seconds
-                        setTimeout(() => {
-                            messageEl.style.display = 'none';
-                        }, 5000);
-                    }).catch((error) => {
-                        messageEl.textContent = 'Error creating author: ' + error.message;
-                        messageEl.classList.remove('success');
-                        messageEl.classList.add('error');
-                        messageEl.style.display = 'block';
                     });
+
+                    messageEl.textContent = '✓ Author account created successfully! They can now login with these credentials.';
+                    messageEl.classList.remove('error');
+                    messageEl.classList.add('success');
+                    messageEl.style.display = 'block';
+                    
+                    document.getElementById('authorUsername').value = '';
+                    document.getElementById('authorPassword').value = '';
+                    
+                    messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                    setTimeout(() => {
+                        messageEl.style.display = 'none';
+                    }, 5000);
                 }
-            }, { onlyOnce: true });
+            } catch (error) {
+                console.error('Create author error:', error);
+                messageEl.textContent = 'Error creating author: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
         }
     </script>
 </body>
