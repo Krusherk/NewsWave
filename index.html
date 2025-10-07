@@ -22,7 +22,6 @@
             line-height: 1.6;
         }
 
-        /* Top Bar */
         .top-bar {
             background: #1a1a1a;
             color: #ffffff;
@@ -55,7 +54,6 @@
             color: #dc2626;
         }
 
-        /* Header */
         header {
             background: #ffffff;
             border-bottom: 1px solid #e5e5e5;
@@ -84,7 +82,6 @@
             letter-spacing: 1px;
         }
 
-        /* Navigation */
         nav {
             background: #ffffff;
             border-bottom: 1px solid #e5e5e5;
@@ -94,13 +91,33 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        nav ul {
+        .nav-container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-icon {
+            display: none;
+            cursor: pointer;
+            padding: 18px 0;
+        }
+
+        .menu-icon span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: #1a1a1a;
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+
+        nav ul {
             list-style: none;
             display: flex;
-            justify-content: center;
             gap: 48px;
         }
 
@@ -122,14 +139,12 @@
             border-bottom-color: #dc2626;
         }
 
-        /* Container */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 40px 40px 80px;
         }
 
-        /* Featured Section */
         .featured-section {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -191,7 +206,6 @@
             margin-right: 16px;
         }
 
-        /* Sidebar */
         .sidebar {
             position: sticky;
             top: 80px;
@@ -280,7 +294,6 @@
             background: #dc2626;
         }
 
-        /* News Grid */
         .section-title {
             font-family: 'Playfair Display', serif;
             font-size: 36px;
@@ -344,7 +357,6 @@
             color: #999;
         }
 
-        /* Article Page */
         .article-page {
             display: none;
         }
@@ -401,6 +413,7 @@
             font-size: 19px;
             line-height: 1.8;
             color: #2a2a2a;
+            white-space: pre-wrap;
         }
 
         .article-body p {
@@ -445,6 +458,7 @@
         .back-btn {
             max-width: 800px;
             margin: 0 auto;
+            display: block;
             padding: 14px 32px;
             background: #1a1a1a;
             color: #ffffff;
@@ -459,137 +473,6 @@
             background: #dc2626;
         }
 
-        /* Admin Pages */
-        .admin-page {
-            display: none;
-            max-width: 600px;
-            margin: 60px auto;
-            background: #ffffff;
-            padding: 48px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.1);
-        }
-
-        .admin-page h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 36px;
-            margin-bottom: 32px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e5e5e5;
-            font-size: 15px;
-            font-family: inherit;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #1a1a1a;
-        }
-
-        .form-group textarea {
-            min-height: 200px;
-            resize: vertical;
-            font-family: 'Lora', serif;
-            line-height: 1.6;
-        }
-
-        .btn {
-            padding: 16px 32px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: #1a1a1a;
-            color: #ffffff;
-            width: 100%;
-        }
-
-        .btn-primary:hover {
-            background: #dc2626;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #1a1a1a;
-            border: 2px solid #1a1a1a;
-            margin-bottom: 20px;
-        }
-
-        .btn-secondary:hover {
-            background: #1a1a1a;
-            color: #ffffff;
-        }
-
-        .admin-tabs {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .admin-tab {
-            flex: 1;
-            padding: 14px;
-            background: #f5f5f5;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-        }
-
-        .admin-tab.active {
-            background: #1a1a1a;
-            color: #ffffff;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .message {
-            padding: 16px;
-            margin-bottom: 24px;
-            border-left: 4px solid #dc2626;
-            background: #f9f9f9;
-            display: none;
-        }
-
-        .message.success {
-            border-left-color: #16a34a;
-        }
-
-        /* Footer */
         footer {
             background: #1a1a1a;
             color: #ffffff;
@@ -622,7 +505,13 @@
             color: #666;
         }
 
-        /* Responsive */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 18px;
+        }
+
         @media (max-width: 1024px) {
             .featured-section {
                 grid-template-columns: 1fr;
@@ -640,20 +529,44 @@
         @media (max-width: 768px) {
             .top-bar-content,
             .header-content,
-            nav ul,
+            .nav-container,
             .container,
             .footer-content {
-                padding: 0 20px;
+                padding-left: 20px;
+                padding-right: 20px;
             }
 
             .logo {
                 font-size: 42px;
             }
 
+            .menu-icon {
+                display: block;
+            }
+
             nav ul {
-                gap: 20px;
-                overflow-x: auto;
-                justify-content: flex-start;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                flex-direction: column;
+                gap: 0;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                display: none;
+            }
+
+            nav ul.active {
+                display: flex;
+            }
+
+            nav ul li {
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            nav a {
+                padding: 16px 40px;
+                border-bottom: none;
             }
 
             .featured-title {
@@ -668,33 +581,19 @@
             .article-title {
                 font-size: 36px;
             }
-
-            .admin-page {
-                margin: 20px;
-                padding: 32px 24px;
-            }
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: #666;
-            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <!-- Top Bar -->
     <div class="top-bar">
         <div class="top-bar-content">
             <div class="date" id="currentDate"></div>
             <div class="admin-link">
-                <a href="#" onclick="showAdminLogin(); return false;">Admin Login</a>
+                <a href="admin.html">Admin Login</a>
             </div>
         </div>
     </div>
 
-    <!-- Header -->
     <header>
         <div class="header-content">
             <h1 class="logo">NewsWave</h1>
@@ -702,24 +601,28 @@
         </div>
     </header>
 
-    <!-- Navigation -->
     <nav>
-        <ul>
-            <li><a href="#" onclick="showHome(); return false;">Home</a></li>
-            <li><a href="#">World</a></li>
-            <li><a href="#">Politics</a></li>
-            <li><a href="#">Business</a></li>
-            <li><a href="#">Technology</a></li>
-            <li><a href="#">Sports</a></li>
-        </ul>
+        <div class="nav-container">
+            <div class="menu-icon" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul id="navMenu">
+                <li><a href="#" onclick="showHome(); return false;">Home</a></li>
+                <li><a href="#">World</a></li>
+                <li><a href="#">Politics</a></li>
+                <li><a href="#">Business</a></li>
+                <li><a href="#">Technology</a></li>
+                <li><a href="#">Sports</a></li>
+            </ul>
+        </div>
     </nav>
 
-    <!-- Home Page -->
     <div id="homePage" class="container">
         <div class="loading">Loading latest news...</div>
     </div>
 
-    <!-- Article Page -->
     <div id="articlePage" class="article-page">
         <div class="container">
             <div class="article-header">
@@ -743,75 +646,6 @@
         </div>
     </div>
 
-    <!-- Admin Login -->
-    <div id="adminLogin" class="admin-page">
-        <h1>Admin Login</h1>
-        <form onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="loginUsername" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" required>
-            </div>
-            <div class="message" id="loginMessage"></div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-    </div>
-
-    <!-- Admin Panel -->
-    <div id="adminPanel" class="admin-page">
-        <button class="btn btn-secondary" onclick="logout()">Logout</button>
-        <h1>Admin Panel</h1>
-        
-        <div class="admin-tabs">
-            <button class="admin-tab active" onclick="switchAdminTab('post')">Post Article</button>
-            <button class="admin-tab" id="authorsTabBtn" onclick="switchAdminTab('authors')">Manage Authors</button>
-        </div>
-
-        <!-- Post Article Tab -->
-        <div id="postTab" class="tab-content active">
-            <form onsubmit="publishArticle(event)">
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" id="postTitle" required>
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <input type="text" id="postCategory" placeholder="e.g., World, Politics, Sports" required>
-                </div>
-                <div class="form-group">
-                    <label>Featured Image URL</label>
-                    <input type="url" id="postImage" required>
-                </div>
-                <div class="form-group">
-                    <label>Article Body</label>
-                    <textarea id="postBody" required></textarea>
-                </div>
-                <div class="message" id="postMessage"></div>
-                <button type="submit" class="btn btn-primary">Publish Article</button>
-            </form>
-        </div>
-
-        <!-- Manage Authors Tab -->
-        <div id="authorsTab" class="tab-content">
-            <form onsubmit="createAuthor(event)">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="authorUsername" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="authorPassword" required>
-                </div>
-                <div class="message" id="authorMessage"></div>
-                <button type="submit" class="btn btn-primary">Create Author</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-logo">NewsWave</div>
@@ -822,7 +656,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAKvLoz1RxFHlPWab7kr_Yl87kyKfZUhXQ",
@@ -840,22 +674,15 @@
 
         window.db = db;
         window.dbRef = ref;
-        window.dbPush = push;
-        window.dbSet = set;
         window.onValue = onValue;
 
         loadNews();
     </script>
 
     <script>
-        let currentUser = null;
-        let currentRole = null;
         let currentArticle = null;
+        let allArticles = [];
 
-        const ADMIN_USERNAME = 'rabiuk';
-        const ADMIN_PASSWORD = 'kareembilkis13$';
-
-        // Display current date
         const dateEl = document.getElementById('currentDate');
         const today = new Date();
         dateEl.textContent = today.toLocaleDateString('en-US', {
@@ -865,132 +692,154 @@
             day: 'numeric'
         });
 
+        function toggleMenu() {
+            document.getElementById('navMenu').classList.toggle('active');
+        }
+
         function showHome() {
             document.getElementById('homePage').style.display = 'block';
             document.getElementById('articlePage').style.display = 'none';
-            document.getElementById('adminLogin').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
             window.history.pushState({}, '', '/');
             window.scrollTo(0, 0);
         }
 
-        function showAdminLogin() {
-            if (currentUser) {
-                showAdminPanel();
-            } else {
-                document.getElementById('homePage').style.display = 'none';
-                document.getElementById('articlePage').style.display = 'none';
-                document.getElementById('adminLogin').style.display = 'block';
-                document.getElementById('adminPanel').style.display = 'none';
-            }
-            window.scrollTo(0, 0);
-        }
-
-        function showAdminPanel() {
-            document.getElementById('homePage').style.display = 'none';
-            document.getElementById('articlePage').style.display = 'none';
-            document.getElementById('adminLogin').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            window.scrollTo(0, 0);
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const messageEl = document.getElementById('loginMessage');
-
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                currentUser = username;
-                currentRole = 'admin';
-                document.getElementById('authorsTabBtn').style.display = 'block';
-                showAdminPanel();
-            } else {
-                checkAuthorCredentials(username, password, messageEl);
-            }
-        }
-
-        function checkAuthorCredentials(username, password, messageEl) {
-            const authorsRef = window.dbRef(window.db, 'authors');
-            window.onValue(authorsRef, (snapshot) => {
-                const authors = snapshot.val();
-                let found = false;
-
-                if (authors) {
-                    Object.values(authors).forEach(author => {
-                        if (author.username === username && author.password === password) {
-                            found = true;
-                            currentUser = username;
-                            currentRole = 'author';
-                            document.getElementById('authorsTabBtn').style.display = 'none';
-                            showAdminPanel();
-                        }
-                    });
-                }
-
-                if (!found) {
-                    messageEl.textContent = 'Invalid username or password';
-                    messageEl.style.display = 'block';
-                }
-            }, { onlyOnce: true });
-        }
-
-        function logout() {
-            currentUser = null;
-            currentRole = null;
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            showHome();
-        }
-
-        function switchAdminTab(tab) {
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            
-            if (tab === 'post') {
-                document.querySelectorAll('.admin-tab')[0].classList.add('active');
-                document.getElementById('postTab').classList.add('active');
-            } else {
-                document.querySelectorAll('.admin-tab')[1].classList.add('active');
-                document.getElementById('authorsTab').classList.add('active');
-            }
-        }
-
-        function createSlug(title) {
-            return title.toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/^-|-$/g, '');
-        }
-
-        function publishArticle(e) {
-            e.preventDefault();
-            const title = document.getElementById('postTitle').value;
-            const category = document.getElementById('postCategory').value;
-            const image = document.getElementById('postImage').value;
-            const body = document.getElementById('postBody').value;
-            const messageEl = document.getElementById('postMessage');
-
+        function loadNews() {
             const newsRef = window.dbRef(window.db, 'news');
-            const newNewsRef = window.dbPush(newsRef);
-            const slug = createSlug(title);
+            window.onValue(newsRef, (snapshot) => {
+                const news = snapshot.val();
+                const homePage = document.getElementById('homePage');
+                
+                if (!news) {
+                    homePage.innerHTML = '<div class="loading">No articles published yet. Check back soon!</div>';
+                    return;
+                }
 
-            window.dbSet(newNewsRef, {
-                title: title,
-                category: category,
-                image: image,
-                body: body,
-                author: currentUser,
-                date: new Date().toISOString(),
-                slug: slug
-            }).then(() => {
-                messageEl.textContent = 'Article published successfully!';
-                messageEl.classList.add('success');
-                messageEl.style.display = 'block';
-                
-                document.getElementById('postTitle').value = '';
-                document.getElementById('postCategory').value = '';
-                document.getElementById('postImage').value = '';
-                document.getElementById('postBody').value = '';
-                
-                setTimeout(() => {
-                    messageEl.style.display = 'none';
+                allArticles = Object.entries(news).map(([key, article]) => ({
+                    id: key,
+                    ...article
+                })).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                if (allArticles.length === 0) {
+                    homePage.innerHTML = '<div class="loading">No articles published yet. Check back soon!</div>';
+                    return;
+                }
+
+                const featured = allArticles[0];
+                const trending = allArticles.slice(1, 6);
+                const latest = allArticles.slice(1, 7);
+
+                homePage.innerHTML = `
+                    <div class="featured-section">
+                        <div class="featured-story" onclick="viewArticle('${featured.id}')">
+                            <img src="${featured.image}" alt="${featured.title}" class="featured-image">
+                            <span class="featured-category">${featured.category || 'News'}</span>
+                            <h2 class="featured-title">${featured.title}</h2>
+                            <p class="featured-excerpt">${featured.body.substring(0, 200)}...</p>
+                            <div class="featured-meta">
+                                <span>By ${featured.author}</span>
+                                <span>${formatDate(featured.date)}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="sidebar">
+                            <div class="sidebar-section">
+                                <h3 class="sidebar-title">Trending Stories</h3>
+                                ${trending.map((article, index) => `
+                                    <div class="trending-item" onclick="viewArticle('${article.id}')">
+                                        <div class="trending-number">${index + 1}</div>
+                                        <div class="trending-title">${article.title}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="sidebar-section">
+                                <div class="newsletter">
+                                    <h3>Subscribe to Newsletter</h3>
+                                    <p>Get the latest news delivered to your inbox</p>
+                                    <input type="email" placeholder="Your email address">
+                                    <button>Subscribe</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="section-title">Latest News</h2>
+                    <div class="news-grid">
+                        ${latest.map(article => `
+                            <div class="news-card" onclick="viewArticle('${article.id}')">
+                                <img src="${article.image}" alt="${article.title}" class="news-image">
+                                <span class="news-category">${article.category || 'News'}</span>
+                                <h3 class="news-title">${article.title}</h3>
+                                <p class="news-excerpt">${article.body.substring(0, 120)}...</p>
+                                <div class="news-meta">
+                                    By ${article.author} • ${formatDate(article.date)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function viewArticle(articleId) {
+            const article = allArticles.find(a => a.id === articleId);
+            if (!article) return;
+
+            currentArticle = article;
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('articlePage').style.display = 'block';
+            
+            document.getElementById('articleCategory').textContent = article.category || 'News';
+            document.getElementById('articleTitle').textContent = article.title;
+            document.getElementById('articleImage').src = article.image;
+            document.getElementById('articleBody').textContent = article.body;
+            document.getElementById('articleAuthor').textContent = `By ${article.author}`;
+            document.getElementById('articleDate').textContent = formatDate(article.date);
+
+            window.history.pushState({}, '', `/${article.slug}`);
+            updateMetaTags(article);
+            window.scrollTo(0, 0);
+        }
+
+        function updateMetaTags(article) {
+            document.title = `${article.title} - NewsWave`;
+            
+            updateOrCreateMeta('og:title', article.title);
+            updateOrCreateMeta('og:image', article.image);
+            updateOrCreateMeta('og:description', article.body.substring(0, 150) + '...');
+            updateOrCreateMeta('og:url', window.location.href);
+        }
+
+        function updateOrCreateMeta(property, content) {
+            let meta = document.querySelector(`meta[property="${property}"]`);
+            if (!meta) {
+                meta = document.createElement('meta');
+                meta.setAttribute('property', property);
+                document.head.appendChild(meta);
+            }
+            meta.setAttribute('content', content);
+        }
+
+        function shareOnWhatsApp() {
+            const url = window.location.href;
+            const text = `Check out this article: ${currentArticle.title}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+        }
+
+        function shareOnTwitter() {
+            const url = window.location.href;
+            const text = currentArticle.title;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
