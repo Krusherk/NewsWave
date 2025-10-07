@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsWave Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 20px 0;
+            border-bottom: 3px solid #dc2626;
+        }
+
+        .admin-header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+        }
+
+        .admin-user {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .admin-user span {
+            color: #dc2626;
+            font-weight: 600;
+            margin: 0 8px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 2px solid #dc2626;
+            color: #dc2626;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            margin-left: 20px;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .login-container {
+            max-width: 500px;
+            margin: 80px auto;
+            background: #ffffff;
+            padding: 48px;
+            border-radius: 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        }
+
+        .login-container h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 32px;
+            font-size: 15px;
+        }
+
+        .admin-panel {
+            display: none;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        .welcome-section h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-section p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            border-bottom: 2px solid #e5e5e5;
+        }
+
+        .tab {
+            padding: 16px 32px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: #1a1a1a;
+            border-bottom-color: #dc2626;
+        }
+
+        .tab-content {
+            display: none;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1a1a1a;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e5e5e5;
+            border-radius: 4px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .btn-success:hover {
+            background: #15803d;
+        }
+
+        .message {
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #16a34a;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin: 20px 40px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+        }
+
+        @media (max-width: 768px) {
+            .admin-header-content,
+            .admin-panel {
+                padding: 0 20px;
+            }
+
+            .login-container {
+                margin: 40px 20px;
+                padding: 32px 24px;
+            }
+
+            .tab-content {
+                padding: 24px;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .tab {
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+
+            .welcome-section {
+                padding: 24px;
+            }
+
+            .welcome-section h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="admin-header-content">
+            <div class="admin-logo">NewsWave Admin</div>
+            <div id="userInfo" style="display: none;">
+                <span class="admin-user">
+                    Logged in as <span id="currentUser"></span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-link">← Back to Website</a>
+
+    <!-- Login Form -->
+    <div id="loginContainer" class="login-container">
+        <h1>Admin Login</h1>
+        <p class="login-subtitle">Enter your credentials to access the admin panel</p>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required autocomplete="current-password">
+            </div>
+            <div class="message" id="loginMessage"></div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+        </form>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="welcome-section">
+            <h1>Welcome back!</h1>
+            <p>Manage your news articles and authors from this dashboard</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('post')">Post Article</button>
+            <button class="tab" id="authorsTabBtn" onclick="switchTab('authors')" style="display: none;">Manage Authors</button>
+        </div>
+
+        <!-- Post Article Tab -->
+        <div id="postTab" class="tab-content active">
+            <h2 class="form-section-title">Create New Article</h2>
+            <form onsubmit="publishArticle(event)">
+                <div class="form-group">
+                    <label>Article Title</label>
+                    <input type="text" id="postTitle" placeholder="Enter a compelling headline" required>
+                    <div class="form-hint">This will be used to generate the URL slug</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="postCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="World">World</option>
+                        <option value="Politics">Politics</option>
+                        <option value="Business">Business</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Health">Health</option>
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Featured Image URL</label>
+                    <input type="url" id="postImage" placeholder="https://example.com/image.jpg" required>
+                    <div class="form-hint">This image will be shown when sharing on social media</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Article Body</label>
+                    <textarea id="postBody" placeholder="Write your article content here..." required></textarea>
+                </div>
+
+                <div class="message" id="postMessage"></div>
+                <button type="submit" class="btn btn-primary">Publish Article</button>
+            </form>
+        </div>
+
+        <!-- Manage Authors Tab -->
+        <div id="authorsTab" class="tab-content">
+            <h2 class="form-section-title">Create Author Account</h2>
+            <p style="color: #666; margin-bottom: 24px;">Authors can login and post articles but cannot manage other authors.</p>
+            
+            <form onsubmit="createAuthor(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="authorUsername" placeholder="Enter username" required>
+                    <div class="form-hint">This will be used to login</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="authorPassword" placeholder="Enter a secure password" required>
+                    <div class="form-hint">Make sure to save this password securely</div>
+                </div>
+
+                <div class="message" id="authorMessage"></div>
+                <button type="submit" class="btn btn-success">Create Author</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKvLoz1RxFHlPWab7kr_Yl87kyKfZUhXQ",
+            authDomain: "newwave-6fe2d.firebaseapp.com",
+            databaseURL: "https://newwave-6fe2d-default-rtdb.firebaseio.com",
+            projectId: "newwave-6fe2d",
+            storageBucket: "newwave-6fe2d.firebasestorage.app",
+            messagingSenderId: "710390847911",
+            appId: "1:710390847911:web:4db0ff17658590bfedfe82",
+            measurementId: "G-WK2M3CL2TB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+
+        window.db = db;
+        window.dbRef = ref;
+        window.dbPush = push;
+        window.dbSet = set;
+        window.onValue = onValue;
+    </script>
+
+    <script>
+        let currentUser = null;
+        let currentRole = null;
+
+        // Admin credentials
+        const ADMIN_USERNAME = 'rabiuk';
+        const ADMIN_PASSWORD = 'kareembilkis13;
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const messageEl = document.getElementById('loginMessage');
+
+            messageEl.style.display = 'none';
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                currentUser = username;
+                currentRole = 'admin';
+                document.getElementById('authorsTabBtn').style.display = 'block';
+                showAdminPanel();
+            } else {
+                checkAuthorCredentials(username, password, messageEl);
+            }
+        }
+
+        function checkAuthorCredentials(username, password, messageEl) {
+            const authorsRef = window.dbRef(window.db, 'authors');
+            window.onValue(authorsRef, (snapshot) => {
+                const authors = snapshot.val();
+                let found = false;
+
+                if (authors) {
+                    Object.values(authors).forEach(author => {
+                        if (author.username === username && author.password === password) {
+                            found = true;
+                            currentUser = username;
+                            currentRole = 'author';
+                            document.getElementById('authorsTabBtn').style.display = 'none';
+                            showAdminPanel();
+                        }
+                    });
+                }
+
+                if (!found) {
+                    messageEl.textContent = 'Invalid username or password. Please try again.';
+                    messageEl.classList.remove('success');
+                    messageEl.classList.add('error');
+                    messageEl.style.display = 'block';
+                }
+            }, { onlyOnce: true });
+        }
+
+        function showAdminPanel() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('currentUser').textContent = currentUser;
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+            
+            // Clear all messages
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.style.display = 'none';
+            });
+            
+            // Reset forms
+            document.querySelectorAll('form').forEach(form => form.reset());
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'post') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('postTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('authorsTab').classList.add('active');
+            }
+        }
+
+        function createSlug(title) {
+            return title.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '')
+                .substring(0, 60);
+        }
+
+        function publishArticle(e) {
+            e.preventDefault();
+            const title = document.getElementById('postTitle').value.trim();
+            const category = document.getElementById('postCategory').value;
+            const image = document.getElementById('postImage').value.trim();
+            const body = document.getElementById('postBody').value.trim();
+            const messageEl = document.getElementById('postMessage');
+
+            const newsRef = window.dbRef(window.db, 'news');
+            const newNewsRef = window.dbPush(newsRef);
+            const slug = createSlug(title);
+
+            messageEl.style.display = 'none';
+
+            window.dbSet(newNewsRef, {
+                title: title,
+                category: category,
+                image: image,
+                body: body,
+                author: currentUser,
+                date: new Date().toISOString(),
+                slug: slug
+            }).then(() => {
+                messageEl.textContent = '✓ Article published successfully! Your article is now live on the website.';
+                messageEl.classList.remove('error');
+                messageEl.classList.add('success');
+                messageEl.style.display = 'block';
+                
+                // Clear form
+                document.getElementById('postTitle').value = '';
+                document.getElementById('postCategory').value = '';
+                document.getElementById('postImage').value = '';
+                document.getElementById('postBody').value = '';
+                
+                // Scroll to message
+                messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }).catch((error) => {
+                messageEl.textContent = 'Error publishing article: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            });
+        }
+
+        function createAuthor(e) {
+            e.preventDefault();
+            const username = document.getElementById('authorUsername').value.trim();
+            const password = document.getElementById('authorPassword').value;
+            const messageEl = document.getElementById('authorMessage');
+
+            messageEl.style.display = 'none';
+
+            // Check if author already exists
+            const authorsRef = window.dbRef(window.db, 'authors');
+            window.onValue(authorsRef, (snapshot) => {
+                const authors = snapshot.val();
+                let exists = false;
+
+                if (authors) {
+                    Object.values(authors).forEach(author => {
+                        if (author.username === username) {
+                            exists = true;
+                        }
+                    });
+                }
+
+                if (exists) {
+                    messageEl.textContent = 'Username already exists. Please choose a different username.';
+                    messageEl.classList.remove('success');
+                    messageEl.classList.add('error');
+                    messageEl.style.display = 'block';
+                } else {
+                    const newAuthorRef = window.dbPush(authorsRef);
+                    window.dbSet(newAuthorRef, {
+                        username: username,
+                        password: password,
+                        role: 'author',
+                        createdAt: new Date().toISOString(),
+                        createdBy: currentUser
+                    }).then(() => {
+                        messageEl.textContent = '✓ Author account created successfully! They can now login with these credentials.';
+                        messageEl.classList.remove('error');
+                        messageEl.classList.add('success');
+                        messageEl.style.display = 'block';
+                        
+                        // Clear form
+                        document.getElementById('authorUsername').value = '';
+                        document.getElementById('authorPassword').value = '';
+                        
+                        // Scroll to message
+                        messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        
+                        // Hide message after 5 seconds
+                        setTimeout(() => {
+                            messageEl.style.display = 'none';
+                        }, 5000);
+                    }).catch((error) => {
+                        messageEl.textContent = 'Error creating author: ' + error.message;
+                        messageEl.classList.remove('success');
+                        messageEl.classList.add('error');
+                        messageEl.style.display = 'block';
+                    });
+                }
+            }, { onlyOnce: true });
+        }
+    </script>
+</body>
+</html>
