@@ -562,7 +562,7 @@
         let currentRole = null;
 
         const ADMIN_USERNAME = 'rabiuk';
-        const ADMIN_PASSWORD = 'kareembilkis13$';
+        const ADMIN_PASSWORD = 'kareembilkis13
 
         document.addEventListener('DOMContentLoaded', function() {
             const imageInput = document.getElementById('postImage');
@@ -583,13 +583,228 @@
 
         async function handleLogin(e) {
             e.preventDefault();
+            
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
             const messageEl = document.getElementById('loginMessage');
 
+            console.log('Login attempt:', username);
+            
             messageEl.style.display = 'none';
 
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+            if (username === 'rabiuk' && password === 'kareembilkis13
+
+        function showAdminPanel() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('currentUser').textContent = currentUser;
+            window.scrollTo(0, 0);
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+            
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.style.display = 'none';
+            });
+            
+            document.querySelectorAll('form').forEach(form => form.reset());
+            window.scrollTo(0, 0);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'post') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('postTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('authorsTab').classList.add('active');
+            }
+        }
+
+        function createSlug(title) {
+            return title.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '')
+                .substring(0, 60);
+        }
+
+        async function publishArticle(e) {
+            e.preventDefault();
+            const title = document.getElementById('postTitle').value.trim();
+            const category = document.getElementById('postCategory').value;
+            const imageFile = document.getElementById('postImage').files[0];
+            const body = document.getElementById('postBody').value.trim();
+            const messageEl = document.getElementById('postMessage');
+
+            if (!imageFile) {
+                messageEl.textContent = 'Please select an image';
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            if (imageFile.size > 5 * 1024 * 1024) {
+                messageEl.textContent = 'Image must be smaller than 5MB';
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            messageEl.style.display = 'none';
+            document.getElementById('uploadProgress').style.display = 'block';
+
+            try {
+                const timestamp = Date.now();
+                const sanitizedFileName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const imageFileName = 'news-images/' + timestamp + '-' + sanitizedFileName;
+                
+                const imageRef = window.storageRef(window.storage, imageFileName);
+                const uploadTask = window.uploadBytesResumable(imageRef, imageFile);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        document.getElementById('progressBar').style.width = progress + '%';
+                        document.getElementById('progressText').textContent = Math.round(progress) + '%';
+                    },
+                    (error) {
+                        document.getElementById('uploadProgress').style.display = 'none';
+                        let errorMessage = 'Upload error: ';
+                        if (error.code === 'storage/unauthorized') {
+                            errorMessage += 'Storage not configured. Please set up Firebase Storage rules.';
+                        } else {
+                            errorMessage += error.message;
+                        }
+                        messageEl.textContent = errorMessage;
+                        messageEl.classList.remove('success');
+                        messageEl.classList.add('error');
+                        messageEl.style.display = 'block';
+                    },
+                    async () => {
+                        try {
+                            const downloadURL = await window.getDownloadURL(uploadTask.snapshot.ref);
+                            
+                            const newsRef = window.dbRef(window.db, 'news');
+                            const newNewsRef = window.dbPush(newsRef);
+                            const slug = createSlug(title);
+
+                            await window.dbSet(newNewsRef, {
+                                title: title,
+                                category: category,
+                                image: downloadURL,
+                                body: body,
+                                author: currentUser,
+                                date: new Date().toISOString(),
+                                slug: slug
+                            });
+
+                            document.getElementById('uploadProgress').style.display = 'none';
+                            messageEl.textContent = 'Article published successfully!';
+                            messageEl.classList.remove('error');
+                            messageEl.classList.add('success');
+                            messageEl.style.display = 'block';
+                            
+                            document.getElementById('postTitle').value = '';
+                            document.getElementById('postCategory').value = '';
+                            document.getElementById('postImage').value = '';
+                            document.getElementById('postBody').value = '';
+                            document.getElementById('imagePreview').style.display = 'none';
+                            
+                            setTimeout(() => {
+                                messageEl.style.display = 'none';
+                            }, 5000);
+                        } catch (error) {
+                            document.getElementById('uploadProgress').style.display = 'none';
+                            messageEl.textContent = 'Error saving article: ' + error.message;
+                            messageEl.classList.remove('success');
+                            messageEl.classList.add('error');
+                            messageEl.style.display = 'block';
+                        }
+                    }
+                );
+            } catch (error) {
+                document.getElementById('uploadProgress').style.display = 'none';
+                messageEl.textContent = 'Error: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        }
+
+        async function createAuthor(e) {
+            e.preventDefault();
+            const username = document.getElementById('authorUsername').value.trim();
+            const password = document.getElementById('authorPassword').value;
+            const messageEl = document.getElementById('authorMessage');
+
+            messageEl.style.display = 'none';
+
+            try {
+                const authorsRef = window.dbRef(window.db, 'authors');
+                const snapshot = await window.dbGet(authorsRef);
+                
+                let exists = false;
+                if (snapshot.exists()) {
+                    const authors = snapshot.val();
+                    for (let authorId in authors) {
+                        if (authors[authorId].username === username) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (exists) {
+                    messageEl.textContent = 'Username already exists';
+                    messageEl.classList.remove('success');
+                    messageEl.classList.add('error');
+                    messageEl.style.display = 'block';
+                } else {
+                    const newAuthorRef = window.dbPush(authorsRef);
+                    await window.dbSet(newAuthorRef, {
+                        username: username,
+                        password: password,
+                        role: 'author',
+                        createdAt: new Date().toISOString(),
+                        createdBy: currentUser
+                    });
+
+                    messageEl.textContent = 'Author created successfully!';
+                    messageEl.classList.remove('error');
+                    messageEl.classList.add('success');
+                    messageEl.style.display = 'block';
+                    
+                    document.getElementById('authorUsername').value = '';
+                    document.getElementById('authorPassword').value = '';
+                    
+                    setTimeout(() => {
+                        messageEl.style.display = 'none';
+                    }, 5000);
+                }
+            } catch (error) {
+                messageEl.textContent = 'Error: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>) {
+                console.log('Admin login successful');
                 currentUser = username;
                 currentRole = 'admin';
                 document.getElementById('authorsTabBtn').style.display = 'block';
@@ -597,9 +812,11 @@
                 return;
             }
 
+            console.log('Checking authors...');
+            
             try {
-                const authorsRef = window.dbRef(window.db, 'authors');
-                const snapshot = await window.dbGet(authorsRef);
+                const authorsRef = window.firebaseRef(window.firebaseDB, 'authors');
+                const snapshot = await window.firebaseGet(authorsRef);
                 
                 if (snapshot.exists()) {
                     const authors = snapshot.val();
@@ -609,6 +826,7 @@
                         const author = authors[authorId];
                         
                         if (author.username === username && author.password === password) {
+                            console.log('Author login successful');
                             found = true;
                             currentUser = username;
                             currentRole = 'author';
@@ -619,18 +837,527 @@
                     }
 
                     if (!found) {
+                        console.log('Login failed');
                         messageEl.textContent = 'Invalid username or password';
                         messageEl.classList.remove('success');
                         messageEl.classList.add('error');
                         messageEl.style.display = 'block';
                     }
                 } else {
+                    console.log('No authors found');
                     messageEl.textContent = 'Invalid username or password';
                     messageEl.classList.remove('success');
                     messageEl.classList.add('error');
                     messageEl.style.display = 'block';
                 }
             } catch (error) {
+                console.error('Login error:', error);
+                messageEl.textContent = 'Login error: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        }
+
+        function showAdminPanel() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('currentUser').textContent = currentUser;
+            window.scrollTo(0, 0);
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+            
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.style.display = 'none';
+            });
+            
+            document.querySelectorAll('form').forEach(form => form.reset());
+            window.scrollTo(0, 0);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'post') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('postTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('authorsTab').classList.add('active');
+            }
+        }
+
+        function createSlug(title) {
+            return title.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '')
+                .substring(0, 60);
+        }
+
+        async function publishArticle(e) {
+            e.preventDefault();
+            const title = document.getElementById('postTitle').value.trim();
+            const category = document.getElementById('postCategory').value;
+            const imageFile = document.getElementById('postImage').files[0];
+            const body = document.getElementById('postBody').value.trim();
+            const messageEl = document.getElementById('postMessage');
+
+            if (!imageFile) {
+                messageEl.textContent = 'Please select an image';
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            if (imageFile.size > 5 * 1024 * 1024) {
+                messageEl.textContent = 'Image must be smaller than 5MB';
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            messageEl.style.display = 'none';
+            document.getElementById('uploadProgress').style.display = 'block';
+
+            try {
+                const timestamp = Date.now();
+                const sanitizedFileName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const imageFileName = 'news-images/' + timestamp + '-' + sanitizedFileName;
+                
+                const imageRef = window.storageRef(window.storage, imageFileName);
+                const uploadTask = window.uploadBytesResumable(imageRef, imageFile);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        document.getElementById('progressBar').style.width = progress + '%';
+                        document.getElementById('progressText').textContent = Math.round(progress) + '%';
+                    },
+                    (error) {
+                        document.getElementById('uploadProgress').style.display = 'none';
+                        let errorMessage = 'Upload error: ';
+                        if (error.code === 'storage/unauthorized') {
+                            errorMessage += 'Storage not configured. Please set up Firebase Storage rules.';
+                        } else {
+                            errorMessage += error.message;
+                        }
+                        messageEl.textContent = errorMessage;
+                        messageEl.classList.remove('success');
+                        messageEl.classList.add('error');
+                        messageEl.style.display = 'block';
+                    },
+                    async () => {
+                        try {
+                            const downloadURL = await window.getDownloadURL(uploadTask.snapshot.ref);
+                            
+                            const newsRef = window.dbRef(window.db, 'news');
+                            const newNewsRef = window.dbPush(newsRef);
+                            const slug = createSlug(title);
+
+                            await window.dbSet(newNewsRef, {
+                                title: title,
+                                category: category,
+                                image: downloadURL,
+                                body: body,
+                                author: currentUser,
+                                date: new Date().toISOString(),
+                                slug: slug
+                            });
+
+                            document.getElementById('uploadProgress').style.display = 'none';
+                            messageEl.textContent = 'Article published successfully!';
+                            messageEl.classList.remove('error');
+                            messageEl.classList.add('success');
+                            messageEl.style.display = 'block';
+                            
+                            document.getElementById('postTitle').value = '';
+                            document.getElementById('postCategory').value = '';
+                            document.getElementById('postImage').value = '';
+                            document.getElementById('postBody').value = '';
+                            document.getElementById('imagePreview').style.display = 'none';
+                            
+                            setTimeout(() => {
+                                messageEl.style.display = 'none';
+                            }, 5000);
+                        } catch (error) {
+                            document.getElementById('uploadProgress').style.display = 'none';
+                            messageEl.textContent = 'Error saving article: ' + error.message;
+                            messageEl.classList.remove('success');
+                            messageEl.classList.add('error');
+                            messageEl.style.display = 'block';
+                        }
+                    }
+                );
+            } catch (error) {
+                document.getElementById('uploadProgress').style.display = 'none';
+                messageEl.textContent = 'Error: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        }
+
+        async function createAuthor(e) {
+            e.preventDefault();
+            const username = document.getElementById('authorUsername').value.trim();
+            const password = document.getElementById('authorPassword').value;
+            const messageEl = document.getElementById('authorMessage');
+
+            messageEl.style.display = 'none';
+
+            try {
+                const authorsRef = window.dbRef(window.db, 'authors');
+                const snapshot = await window.dbGet(authorsRef);
+                
+                let exists = false;
+                if (snapshot.exists()) {
+                    const authors = snapshot.val();
+                    for (let authorId in authors) {
+                        if (authors[authorId].username === username) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (exists) {
+                    messageEl.textContent = 'Username already exists';
+                    messageEl.classList.remove('success');
+                    messageEl.classList.add('error');
+                    messageEl.style.display = 'block';
+                } else {
+                    const newAuthorRef = window.dbPush(authorsRef);
+                    await window.dbSet(newAuthorRef, {
+                        username: username,
+                        password: password,
+                        role: 'author',
+                        createdAt: new Date().toISOString(),
+                        createdBy: currentUser
+                    });
+
+                    messageEl.textContent = 'Author created successfully!';
+                    messageEl.classList.remove('error');
+                    messageEl.classList.add('success');
+                    messageEl.style.display = 'block';
+                    
+                    document.getElementById('authorUsername').value = '';
+                    document.getElementById('authorPassword').value = '';
+                    
+                    setTimeout(() => {
+                        messageEl.style.display = 'none';
+                    }, 5000);
+                }
+            } catch (error) {
+                messageEl.textContent = 'Error: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('postImage');
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            document.getElementById('previewImg').src = event.target.result;
+                            document.getElementById('imagePreview').style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const messageEl = document.getElementById('loginMessage');
+
+            console.log('Login attempt:', username);
+            
+            messageEl.style.display = 'none';
+
+            if (username === 'rabiuk' && password === 'kareembilkis13
+
+        function showAdminPanel() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('currentUser').textContent = currentUser;
+            window.scrollTo(0, 0);
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+            
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.style.display = 'none';
+            });
+            
+            document.querySelectorAll('form').forEach(form => form.reset());
+            window.scrollTo(0, 0);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'post') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('postTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('authorsTab').classList.add('active');
+            }
+        }
+
+        function createSlug(title) {
+            return title.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '')
+                .substring(0, 60);
+        }
+
+        async function publishArticle(e) {
+            e.preventDefault();
+            const title = document.getElementById('postTitle').value.trim();
+            const category = document.getElementById('postCategory').value;
+            const imageFile = document.getElementById('postImage').files[0];
+            const body = document.getElementById('postBody').value.trim();
+            const messageEl = document.getElementById('postMessage');
+
+            if (!imageFile) {
+                messageEl.textContent = 'Please select an image';
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            if (imageFile.size > 5 * 1024 * 1024) {
+                messageEl.textContent = 'Image must be smaller than 5MB';
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            messageEl.style.display = 'none';
+            document.getElementById('uploadProgress').style.display = 'block';
+
+            try {
+                const timestamp = Date.now();
+                const sanitizedFileName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const imageFileName = 'news-images/' + timestamp + '-' + sanitizedFileName;
+                
+                const imageRef = window.storageRef(window.storage, imageFileName);
+                const uploadTask = window.uploadBytesResumable(imageRef, imageFile);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        document.getElementById('progressBar').style.width = progress + '%';
+                        document.getElementById('progressText').textContent = Math.round(progress) + '%';
+                    },
+                    (error) {
+                        document.getElementById('uploadProgress').style.display = 'none';
+                        let errorMessage = 'Upload error: ';
+                        if (error.code === 'storage/unauthorized') {
+                            errorMessage += 'Storage not configured. Please set up Firebase Storage rules.';
+                        } else {
+                            errorMessage += error.message;
+                        }
+                        messageEl.textContent = errorMessage;
+                        messageEl.classList.remove('success');
+                        messageEl.classList.add('error');
+                        messageEl.style.display = 'block';
+                    },
+                    async () => {
+                        try {
+                            const downloadURL = await window.getDownloadURL(uploadTask.snapshot.ref);
+                            
+                            const newsRef = window.dbRef(window.db, 'news');
+                            const newNewsRef = window.dbPush(newsRef);
+                            const slug = createSlug(title);
+
+                            await window.dbSet(newNewsRef, {
+                                title: title,
+                                category: category,
+                                image: downloadURL,
+                                body: body,
+                                author: currentUser,
+                                date: new Date().toISOString(),
+                                slug: slug
+                            });
+
+                            document.getElementById('uploadProgress').style.display = 'none';
+                            messageEl.textContent = 'Article published successfully!';
+                            messageEl.classList.remove('error');
+                            messageEl.classList.add('success');
+                            messageEl.style.display = 'block';
+                            
+                            document.getElementById('postTitle').value = '';
+                            document.getElementById('postCategory').value = '';
+                            document.getElementById('postImage').value = '';
+                            document.getElementById('postBody').value = '';
+                            document.getElementById('imagePreview').style.display = 'none';
+                            
+                            setTimeout(() => {
+                                messageEl.style.display = 'none';
+                            }, 5000);
+                        } catch (error) {
+                            document.getElementById('uploadProgress').style.display = 'none';
+                            messageEl.textContent = 'Error saving article: ' + error.message;
+                            messageEl.classList.remove('success');
+                            messageEl.classList.add('error');
+                            messageEl.style.display = 'block';
+                        }
+                    }
+                );
+            } catch (error) {
+                document.getElementById('uploadProgress').style.display = 'none';
+                messageEl.textContent = 'Error: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        }
+
+        async function createAuthor(e) {
+            e.preventDefault();
+            const username = document.getElementById('authorUsername').value.trim();
+            const password = document.getElementById('authorPassword').value;
+            const messageEl = document.getElementById('authorMessage');
+
+            messageEl.style.display = 'none';
+
+            try {
+                const authorsRef = window.dbRef(window.db, 'authors');
+                const snapshot = await window.dbGet(authorsRef);
+                
+                let exists = false;
+                if (snapshot.exists()) {
+                    const authors = snapshot.val();
+                    for (let authorId in authors) {
+                        if (authors[authorId].username === username) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (exists) {
+                    messageEl.textContent = 'Username already exists';
+                    messageEl.classList.remove('success');
+                    messageEl.classList.add('error');
+                    messageEl.style.display = 'block';
+                } else {
+                    const newAuthorRef = window.dbPush(authorsRef);
+                    await window.dbSet(newAuthorRef, {
+                        username: username,
+                        password: password,
+                        role: 'author',
+                        createdAt: new Date().toISOString(),
+                        createdBy: currentUser
+                    });
+
+                    messageEl.textContent = 'Author created successfully!';
+                    messageEl.classList.remove('error');
+                    messageEl.classList.add('success');
+                    messageEl.style.display = 'block';
+                    
+                    document.getElementById('authorUsername').value = '';
+                    document.getElementById('authorPassword').value = '';
+                    
+                    setTimeout(() => {
+                        messageEl.style.display = 'none';
+                    }, 5000);
+                }
+            } catch (error) {
+                messageEl.textContent = 'Error: ' + error.message;
+                messageEl.classList.remove('success');
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>) {
+                console.log('Admin login successful');
+                currentUser = username;
+                currentRole = 'admin';
+                document.getElementById('authorsTabBtn').style.display = 'block';
+                showAdminPanel();
+                return;
+            }
+
+            console.log('Checking authors...');
+            
+            try {
+                const authorsRef = window.firebaseRef(window.firebaseDB, 'authors');
+                const snapshot = await window.firebaseGet(authorsRef);
+                
+                if (snapshot.exists()) {
+                    const authors = snapshot.val();
+                    let found = false;
+
+                    for (let authorId in authors) {
+                        const author = authors[authorId];
+                        
+                        if (author.username === username && author.password === password) {
+                            console.log('Author login successful');
+                            found = true;
+                            currentUser = username;
+                            currentRole = 'author';
+                            document.getElementById('authorsTabBtn').style.display = 'none';
+                            showAdminPanel();
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        console.log('Login failed');
+                        messageEl.textContent = 'Invalid username or password';
+                        messageEl.classList.remove('success');
+                        messageEl.classList.add('error');
+                        messageEl.style.display = 'block';
+                    }
+                } else {
+                    console.log('No authors found');
+                    messageEl.textContent = 'Invalid username or password';
+                    messageEl.classList.remove('success');
+                    messageEl.classList.add('error');
+                    messageEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
                 messageEl.textContent = 'Login error: ' + error.message;
                 messageEl.classList.remove('success');
                 messageEl.classList.add('error');
