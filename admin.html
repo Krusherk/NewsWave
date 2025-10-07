@@ -528,7 +528,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getDatabase, ref, push, set, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAKvLoz1RxFHlPWab7kr_Yl87kyKfZUhXQ",
@@ -542,19 +541,20 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getDatabase(app);
         const storage = getStorage(app);
 
-        window.db = db;
-        window.storage = storage;
-        window.dbRef = ref;
-        window.dbPush = push;
-        window.dbSet = set;
-        window.dbGet = get;
-        window.storageRef = storageRef;
-        window.uploadBytesResumable = uploadBytesResumable;
-        window.getDownloadURL = getDownloadURL;
+        window.firebaseDB = db;
+        window.firebaseStorage = storage;
+        window.firebaseRef = ref;
+        window.firebasePush = push;
+        window.firebaseSet = set;
+        window.firebaseGet = get;
+        window.firebaseStorageRef = storageRef;
+        window.firebaseUpload = uploadBytesResumable;
+        window.firebaseGetURL = getDownloadURL;
+        
+        console.log('Firebase initialized successfully');
     </script>
 
     <script>
