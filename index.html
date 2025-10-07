@@ -512,6 +512,7 @@
             font-size: 18px;
         }
 
+        /* Tablet Optimization */
         @media (max-width: 1024px) {
             .featured-section {
                 grid-template-columns: 1fr;
@@ -523,9 +524,19 @@
 
             .news-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 32px;
+            }
+
+            .featured-image {
+                height: 400px;
+            }
+
+            .news-image {
+                height: 200px;
             }
         }
 
+        /* Mobile Optimization */
         @media (max-width: 768px) {
             .top-bar-content,
             .header-content,
@@ -536,8 +547,21 @@
                 padding-right: 20px;
             }
 
+            .top-bar {
+                padding: 6px 0;
+                font-size: 12px;
+            }
+
             .logo {
-                font-size: 42px;
+                font-size: 36px;
+            }
+
+            .tagline {
+                font-size: 12px;
+            }
+
+            .header-content {
+                padding: 20px;
             }
 
             .menu-icon {
@@ -565,21 +589,224 @@
             }
 
             nav a {
-                padding: 16px 40px;
+                padding: 14px 20px;
                 border-bottom: none;
+                font-size: 13px;
+            }
+
+            .container {
+                padding: 24px 20px 40px;
+            }
+
+            .featured-section {
+                gap: 32px;
+                margin-bottom: 40px;
+            }
+
+            .featured-image {
+                height: 250px;
+                margin-bottom: 16px;
+            }
+
+            .featured-category {
+                font-size: 11px;
+                padding: 5px 12px;
             }
 
             .featured-title {
-                font-size: 32px;
+                font-size: 26px;
+                margin-bottom: 12px;
+            }
+
+            .featured-excerpt {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .featured-meta {
+                font-size: 13px;
+            }
+
+            .sidebar-title {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+
+            .trending-number {
+                font-size: 24px;
+            }
+
+            .trending-title {
+                font-size: 15px;
+            }
+
+            .newsletter {
+                padding: 20px;
+            }
+
+            .newsletter h3 {
+                font-size: 18px;
+            }
+
+            .newsletter input,
+            .newsletter button {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .section-title {
+                font-size: 28px;
+                margin-bottom: 24px;
             }
 
             .news-grid {
                 grid-template-columns: 1fr;
-                gap: 32px;
+                gap: 28px;
+                margin-bottom: 40px;
+            }
+
+            .news-image {
+                height: 200px;
+            }
+
+            .news-category {
+                font-size: 11px;
+            }
+
+            .news-title {
+                font-size: 20px;
+            }
+
+            .news-excerpt {
+                font-size: 14px;
+            }
+
+            .news-meta {
+                font-size: 12px;
+            }
+
+            .article-header {
+                margin-bottom: 24px;
+            }
+
+            .article-category {
+                font-size: 11px;
+                padding: 6px 12px;
             }
 
             .article-title {
-                font-size: 36px;
+                font-size: 32px;
+                margin-bottom: 16px;
+            }
+
+            .article-meta {
+                font-size: 13px;
+                margin-bottom: 24px;
+                padding-bottom: 16px;
+            }
+
+            .article-meta span {
+                margin-right: 12px;
+                display: inline-block;
+                margin-bottom: 4px;
+            }
+
+            .article-image {
+                max-height: 300px;
+                margin-bottom: 24px;
+            }
+
+            .article-body {
+                font-size: 17px;
+                line-height: 1.7;
+            }
+
+            .share-section {
+                margin: 32px auto;
+                padding: 24px 0;
+            }
+
+            .share-title {
+                font-size: 15px;
+            }
+
+            .share-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .share-btn {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+
+            .back-btn {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .footer-logo {
+                font-size: 28px;
+            }
+
+            .footer-tagline {
+                font-size: 13px;
+            }
+
+            .copyright {
+                font-size: 12px;
+            }
+        }
+
+        /* Small Mobile Optimization */
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 32px;
+            }
+
+            .featured-title {
+                font-size: 22px;
+            }
+
+            .featured-excerpt {
+                font-size: 15px;
+            }
+
+            .news-title {
+                font-size: 18px;
+            }
+
+            .article-title {
+                font-size: 28px;
+            }
+
+            .article-body {
+                font-size: 16px;
+            }
+        }
+
+        /* Desktop Large Screen Optimization */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1600px;
+            }
+
+            .featured-image {
+                height: 550px;
+            }
+
+            .featured-title {
+                font-size: 52px;
+            }
+
+            .news-image {
+                height: 260px;
+            }
+
+            .article-image {
+                max-height: 700px;
             }
         }
     </style>
